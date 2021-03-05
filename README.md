@@ -1,4 +1,5 @@
 # obs-script-delay-repeat-media
+### eng
 Script for OBS studio.  The script for activating/restarting the Media file some time later.
 For example, you need to periodically display information about yourself(channel, subscriptions, advertising, etc.) every 30 minutes during the broadcast.
 Settings script:
@@ -9,9 +10,9 @@ Settings script:
 
 OBS source is visible.
 
+# 
 
-
-
+### rus
 Скрипт для активации/перезапуска Медиа файла по истечении определенного времени.
 К примеру вам требуется во время трансляции периодически раз в 30 минут выводить информацию о себе(канале, подписках, рекламе и другое).
 Настройки скрипта:
