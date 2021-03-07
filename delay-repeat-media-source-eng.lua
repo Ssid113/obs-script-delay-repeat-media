@@ -13,10 +13,14 @@ local ssid_sceneitem = nil 			--media obgect  obs_source_t
 function on_off() 					--function on/off timer
 	if ssid_switch and not ssid_start then 
 		if ssid_random then 		--random mode
-			obs.timer_add(play_source,random(ssid_total_seconds_from, ssid_total_seconds_to)*1000)
+			local seconds = random(ssid_total_seconds_from, ssid_total_seconds_to)
+			local mseconds = seconds*1000
+			print("Seconds before new timer: " .. tostring(seconds))
+			obs.timer_add(play_source, mseconds)
 			ssid_start = not ssid_start
 		else						--normal mode
-			obs.timer_add(play_source,ssid_total_seconds*1000)
+			print("Seconds before new timer: " .. tostring(ssid_total_seconds))
+			obs.timer_add(play_source, ssid_total_seconds*1000)
 			ssid_start = not ssid_start
 		end
 		print("Start script timer. State timer = " .. tostring(ssid_start))
@@ -42,7 +46,10 @@ function play_source() 				--Run source media
 	end
 	if ssid_random then				--Re-timer for random mode
 		obs.timer_remove(play_source)
-		obs.timer_add(play_source,random(ssid_total_seconds_from, ssid_total_seconds_to)*1000)
+		local seconds = random(ssid_total_seconds_from, ssid_total_seconds_to)
+		local mseconds = seconds*1000
+		print("Seconds before new timer: " .. tostring(seconds))
+		obs.timer_add(play_source, mseconds)
 	end
 end
 

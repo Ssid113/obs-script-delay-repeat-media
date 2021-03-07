@@ -13,9 +13,13 @@ local ssid_sceneitem = nil 			--объект медиа источник
 function on_off() 					--Функция включения таймера
 	if ssid_switch and not ssid_start then 
 		if ssid_random then
-			obs.timer_add(play_source,random(ssid_total_seconds_from, ssid_total_seconds_to)*1000) --Подписываемся
+			local seconds = random(ssid_total_seconds_from, ssid_total_seconds_to)
+			local mseconds = seconds*1000
+			print("Секунд до нового таймера: " .. tostring(seconds))
+			obs.timer_add(play_source, mseconds) --Подписываемся
 			ssid_start = not ssid_start
 		else
+			print("Секунд до нового таймера: " .. tostring(ssid_total_seconds))
 			obs.timer_add(play_source,ssid_total_seconds*1000) --Подписываемся
 			ssid_start = not ssid_start
 		end
@@ -42,11 +46,14 @@ function play_source() 				--Запустить источник
 	end
 	if ssid_random then				--Для рандома требуется каждый раз отписываться и подписываться на таймер с указанием нового времени.
 		obs.timer_remove(play_source)
-		obs.timer_add(play_source,random(ssid_total_seconds_from, ssid_total_seconds_to)*1000)
+		local seconds = random(ssid_total_seconds_from, ssid_total_seconds_to)
+		local mseconds = seconds*1000
+		print("Секунд до нового таймера: " .. tostring(seconds))
+		obs.timer_add(play_source, mseconds)
 	end
 end
 
-local u = 0 						--don't delete for random
+local u = 0 						--не удалять для рандома
 function random(x, y) 				--random функция
     u = u + 1	
     if x ~= nil and y ~= nil then
