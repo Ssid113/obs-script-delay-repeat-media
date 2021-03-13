@@ -297,7 +297,7 @@ end
 
 function script_defaults(settings) 			--начальные значения
 	obs.obs_data_set_default_bool(settings, "ssid_switch", false)
-	obs.obs_data_set_default_string(settings, "ssid_locale", 1)
+	obs.obs_data_set_default_int(settings, "ssid_locale", 1)
 	obs.obs_data_set_default_int(settings, "ssid_mode", 1)
 	obs.obs_data_set_default_bool(settings, "ssid_random", false)
 	obs.obs_data_set_default_int(settings, "ssid_total_seconds", 1)
