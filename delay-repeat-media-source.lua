@@ -310,3 +310,29 @@ function script_defaults(settings) 			--начальные значения
 	script_load(settings) --нам нужно загрузить данные до функции script_description()
 	obs.obs_frontend_add_event_callback(on_event)
 end
+<<<<<<< HEAD
+=======
+
+--function script_unload()
+	--timers_remove()
+--end
+
+--function get_sceneitem_from_source_name_in_current_scene(name) --получаем медиа по имени
+--  local result_sceneitem = nil
+--  local current_scene_as_source = obs.obs_frontend_get_current_scene()
+--  if current_scene_as_source then
+--    local current_scene = obs.obs_scene_from_source(current_scene_as_source)
+--	if current_scene then
+--		result_sceneitem = obs.obs_scene_find_source_recursive(current_scene, name)
+--	end
+--   obs.obs_source_release(current_scene_as_source)
+--  end
+--  return result_sceneitem
+--end
+
+--function set_settings_source(source) 	--source = obs_source_t
+--		local pr_settings = obs.obs_source_get_private_settings(source)
+--		obs.obs_source_update(source, pr_settings)
+--		obs.obs_data_release(pr_settings)
+--end
+>>>>>>> 679b847f8e08c7b112c4713b9d7a3b990b6e3d32
