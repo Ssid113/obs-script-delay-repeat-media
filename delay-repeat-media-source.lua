@@ -1,5 +1,5 @@
 local obs = obslua							--obs
-local ssid_current_version = "v0.2.2"
+local ssid_current_version = "v0.3.1"
 local ssid_switch = true 					--Флаг таймера
 local ssid_random = false 					--рандомное срабатывание
 local ssid_total_seconds = 10 				--секунды таймера
