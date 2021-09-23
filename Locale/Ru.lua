@@ -25,5 +25,6 @@ localization.locales.ru = {
 	repeat_from = "От (сек):",
 	repeat_to = "До (сек):",
 	select_source = "Выберите источник",
-	on_off_timer = "Вкл/Выкл таймер"
+	on_off_timer = "Вкл/Выкл таймер",
+	video_list = "Список видео"
 }

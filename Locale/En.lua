@@ -25,5 +25,6 @@ localization.locales.en = {
 	repeat_from = "From (sec):",
 	repeat_to = "To (sec):",
 	select_source = "Select source",
-	on_off_timer = "On/Off timer"
+	on_off_timer = "On/Off timer",
+	video_list = "Playlist"
 }

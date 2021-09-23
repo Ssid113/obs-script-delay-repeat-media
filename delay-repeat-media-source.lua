@@ -1,5 +1,5 @@
 local obs = obslua							--obs
-local ssid_current_version = "v0.2.1"
+local ssid_current_version = "v0.2.2"
 local ssid_switch = true 					--Флаг таймера
 local ssid_random = false 					--рандомное срабатывание
 local ssid_total_seconds = 10 				--секунды таймера
@@ -220,6 +220,8 @@ function script_properties() 				--Страница настроек
 	end
 --	obs.obs_properties_add_bool(props, "ssid_playlist_delay", "Отключить автопереход в плейлисте")
 	obs.obs_properties_add_bool(props, "ssid_switch", localization.translate('on_off_timer'))
+--	obs.obs_properties_add_path(props, "local_file", "test", obs.OBS_PATH_FILE, " (*.mp4 *.ts *.mov *.flv *.mkv *.avi *.gif *.webm);;", nil)
+	obs.obs_properties_add_editable_list(props, "local_file_array", localization.translate('video_list'), obs.OBS_EDITABLE_LIST_TYPE_FILES, " (*.mp4 *.ts *.mov *.flv *.mkv *.avi *.gif *.webm);;", nil)
 	obs.source_list_release(sources)
 	obs.obs_properties_apply_settings(props, my_settings)
 	return props
@@ -297,7 +299,7 @@ end
 
 function script_defaults(settings) 			--начальные значения
 	obs.obs_data_set_default_bool(settings, "ssid_switch", false)
-	obs.obs_data_set_default_string(settings, "ssid_locale", 1)
+	obs.obs_data_set_default_int(settings, "ssid_locale", 1)
 	obs.obs_data_set_default_int(settings, "ssid_mode", 1)
 	obs.obs_data_set_default_bool(settings, "ssid_random", false)
 	obs.obs_data_set_default_int(settings, "ssid_total_seconds", 1)
@@ -308,26 +310,3 @@ function script_defaults(settings) 			--начальные значения
 	script_load(settings) --нам нужно загрузить данные до функции script_description()
 	obs.obs_frontend_add_event_callback(on_event)
 end
-
---function script_unload()
-	--timers_remove()
---end
-
---function get_sceneitem_from_source_name_in_current_scene(name) --получаем медиа по имени
---  local result_sceneitem = nil
---  local current_scene_as_source = obs.obs_frontend_get_current_scene()
---  if current_scene_as_source then
---    local current_scene = obs.obs_scene_from_source(current_scene_as_source)
---	if current_scene then
---		result_sceneitem = obs.obs_scene_find_source_recursive(current_scene, name)
---	end
---   obs.obs_source_release(current_scene_as_source)
---  end
---  return result_sceneitem
---end
-
---function set_settings_source(source) 	--source = obs_source_t
---		local pr_settings = obs.obs_source_get_private_settings(source)
---		obs.obs_source_update(source, pr_settings)
---		obs.obs_data_release(pr_settings)
---end
