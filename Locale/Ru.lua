@@ -26,5 +26,8 @@ localization.locales.ru = {
 	repeat_to = "До (сек):",
 	select_source = "Выберите источник",
 	on_off_timer = "Вкл/Выкл таймер",
-	video_list = "Список видео"
+	video_list = "Список видео",
+	select_playlist_mode = "Режим плейлиста",
+	standart_playlist = "Последовательно",
+	random_playlist = "Случайно"
 }

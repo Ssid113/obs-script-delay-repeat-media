@@ -26,5 +26,8 @@ localization.locales.en = {
 	repeat_to = "To (sec):",
 	select_source = "Select source",
 	on_off_timer = "On/Off timer",
-	video_list = "Playlist"
+	video_list = "Playlist",
+	select_playlist_mode = "Playlist mode",
+	standart_playlist = "Consecutive",
+	random_playlist = "Random"
 }

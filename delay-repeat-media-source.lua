@@ -6,11 +6,12 @@ local ssid_total_seconds = 10 				--секунды таймера
 local ssid_total_seconds_from = 1 			--секунды таймера для рандома от
 local ssid_total_seconds_to = 10 			--секунды таймера для рандома до
 local ssid_source_name = "" 				--имя источника
+local local_file_array = {}					--список файлов
 local ssid_visible = false					--Видимость источника
 local ssid_mode = 1
 local ssid_locale = 1
-
---local ssid_playlist_delay = false			--true - видео в плейлистах воспроизводить по одному
+local ssid_playlist_mode = 1
+local ssid_number = 0
 
 local localization = require 'Locale/Localization'
 require 'Locale/En'
@@ -25,6 +26,7 @@ function play_source() 						--Запустить источник
 	if ssid_sceneitem then
 		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
 		if ssid_visible then
+			obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
 			obs.obs_source_update(ssid_sceneitem, pr_settings)
 		end
 		obs.timer_add(play_source,ssid_total_seconds*1000)
@@ -36,25 +38,6 @@ function play_source() 						--Запустить источник
 	print(" ")
 end
 
---function play_source_playlist_delay()		--Запустить источник с прерыванием воспроизведение плейлиста
---	print("Функция play_source_playlist_delay запускает видео")
---	print("Время ожидания до следующего запуска = " .. ssid_total_seconds)
---	print("Функция play_source_playlist_delay запускает прерывание следующего видео в плейлисте")
---	obs.timer_remove(play_source_playlist_delay)
---	local ssid_sceneitem = obs.obs_get_source_by_name(ssid_source_name)
---	if ssid_sceneitem then
---		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
---		if ssid_visible then
---			obs.obs_source_update(ssid_sceneitem, pr_settings)
---		end
---		obs.timer_add(play_source_playlist_delay,ssid_total_seconds*1000)
---		obs.timer_remove(media_get_duration)
---		obs.timer_add(media_get_duration,100)
---		obs.obs_data_release(pr_settings)
---	end
---	obs.obs_source_release(ssid_sceneitem)
---end
-
 function play_source_random()				--Запускать источник рандомно
 	print(localization.translate('play_source_random'))
 	local rand = random(ssid_total_seconds_from, ssid_total_seconds_to)
@@ -64,6 +47,7 @@ function play_source_random()				--Запускать источник ранд�
 	if ssid_sceneitem then
 		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
 		if ssid_visible then
+			obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
 			obs.obs_source_update(ssid_sceneitem, pr_settings)
 		end
 		obs.timer_add(play_source_random,rand*1000)
@@ -75,32 +59,10 @@ function play_source_random()				--Запускать источник ранд�
 	print(" ")
 end
 
---function play_source_random_playlist_delay()	--Запускать источник рандомно с прерыванием воспроизведение плейлиста
---	print("Функция play_source_random_playlist_delay запускает видео")
---	local rand = random(ssid_total_seconds_from, ssid_total_seconds_to)
---	print("Время ожидания до следующего запуска = " .. rand)
---	print("Функция play_source_random_playlist_delay запускает прерывание следующего видео в плейлисте")
---	obs.timer_remove(play_source_random_playlist_delay)
---	local ssid_sceneitem = obs.obs_get_source_by_name(ssid_source_name)
---	if ssid_sceneitem then
---		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
---		if ssid_visible then
---			obs.obs_source_update(ssid_sceneitem, pr_settings)
---		end
---		obs.timer_add(play_source_random_playlist_delay,rand*1000)
---		obs.timer_remove(media_get_duration)
---		obs.timer_add(media_get_duration,100)
---		obs.obs_data_release(pr_settings)
---	end
---	obs.obs_source_release(ssid_sceneitem)
---end
-
 ----------------------------------------------SECOND FUNCTION----------------------------------------------------------------
 function timers_remove()					--Останавливаем все таймеры
 	obs.timer_remove(play_source)
---	obs.timer_remove(play_source_playlist_delay)
 	obs.timer_remove(play_source_random)
---	obs.timer_remove(play_source_random_playlist_delay)
 end
 
 function media_stop()
@@ -160,6 +122,20 @@ function disconnect_signal()				--Отписываемся от сигналов
 	obs.obs_source_release(ssid_sceneitem)
 end
 
+function array_number()						--Выбираем файл в плейлисте--
+	if ssid_playlist_mode == 1 then
+		if obs.obs_data_array_count(local_file_array) == ssid_number then
+			ssid_number = 1
+		else
+			ssid_number = ssid_number + 1
+		end
+	else
+		ssid_number = random(1, obs.obs_data_array_count(local_file_array))
+	end
+	print(ssid_number - 1)
+	return ssid_number - 1
+end
+
 
 ---------------------------------------------------------------SETTINGS------------------------------------------------------------------
 function start_update()						--При обновлении параметров настраиваем таймеры
@@ -193,6 +169,7 @@ end
 my_settings = nil
 function script_properties() 				--Страница настроек
 	local props = obs.obs_properties_create()
+	obs.obs_properties_add_bool(props, "ssid_switch", localization.translate('on_off_timer'))
 	local p1 = obs.obs_properties_add_list(props, "ssid_locale", localization.translate('select_lang'), obslua.OBS_COMBO_TYPE_LIST, obslua.OBS_COMBO_FORMAT_INT)
 	MY_OPTIONS = {"English", "Русский"}
 	for i,v in ipairs(MY_OPTIONS) do
@@ -218,9 +195,11 @@ function script_properties() 				--Страница настроек
 			end
 		end
 	end
---	obs.obs_properties_add_bool(props, "ssid_playlist_delay", "Отключить автопереход в плейлисте")
-	obs.obs_properties_add_bool(props, "ssid_switch", localization.translate('on_off_timer'))
---	obs.obs_properties_add_path(props, "local_file", "test", obs.OBS_PATH_FILE, " (*.mp4 *.ts *.mov *.flv *.mkv *.avi *.gif *.webm);;", nil)
+	local p4 = obs.obs_properties_add_list(props, "ssid_playlist_mode", localization.translate('select_playlist_mode'), obslua.OBS_COMBO_TYPE_LIST, obslua.OBS_COMBO_FORMAT_INT)
+	MY_OPTIONS_1 = {localization.translate('standart_playlist'), localization.translate('random_playlist')}
+	for i,v in ipairs(MY_OPTIONS_1) do
+		obs.obs_property_list_add_int(p4, v, i)
+	end
 	obs.obs_properties_add_editable_list(props, "local_file_array", localization.translate('video_list'), obs.OBS_EDITABLE_LIST_TYPE_FILES, " (*.mp4 *.ts *.mov *.flv *.mkv *.avi *.gif *.webm);;", nil)
 	obs.source_list_release(sources)
 	obs.obs_properties_apply_settings(props, my_settings)
@@ -259,11 +238,12 @@ function script_update(settings) 			--Обновление настроек.
 	else
 		ssid_random = true
 	end
+	ssid_playlist_mode = obs.obs_data_get_int(settings, "ssid_playlist_mode")
 	ssid_source_name = obs.obs_data_get_string(settings, "ssid_source_name")
 	ssid_total_seconds = obs.obs_data_get_int(settings, "ssid_total_seconds")
 	ssid_total_seconds_from = obs.obs_data_get_int(settings, "ssid_total_seconds_from")
 	ssid_total_seconds_to = obs.obs_data_get_int(settings, "ssid_total_seconds_to")
---	ssid_playlist_delay = obs.obs_data_get_bool(settings, "ssid_playlist_delay")
+	local_file_array = obs.obs_data_get_array(settings, "local_file_array")
 	start_update()
 	
 	my_settings = settings
@@ -273,12 +253,12 @@ function script_save(settings) 				--сохраняем настройки
     obs.obs_data_set_bool(settings, "ssid_switch", ssid_switch)
 	obs.obs_data_set_int(settings, "ssid_locale", ssid_locale)
 	obs.obs_data_set_int(settings, "ssid_mode", ssid_mode)
+	obs.obs_data_set_int(settings, "ssid_playlist_mode", ssid_playlist_mode)
 	obs.obs_data_set_bool(settings, "ssid_random", ssid_random)
 	obs.obs_data_set_int(settings, "ssid_total_seconds", ssid_total_seconds)
 	obs.obs_data_set_int(settings, "ssid_total_seconds_from", ssid_total_seconds_from)
 	obs.obs_data_set_int(settings, "ssid_total_seconds_to", ssid_total_seconds_to)
 	obs.obs_data_set_string(settings, "ssid_source_name", ssid_source_name)
---	obs.obs_data_set_bool(settings, "ssid_playlist_delay", ssid_playlist_delay)
 end
 
 function script_load(settings) 				--загружаем настройки
@@ -289,24 +269,25 @@ function script_load(settings) 				--загружаем настройки
 	print(" ")
 	ssid_switch = obs.obs_data_get_bool(settings, "ssid_switch")
 	ssid_mode = obs.obs_data_get_int(settings, "ssid_mode")
+	ssid_playlist_mode = obs.obs_data_get_int(settings, "ssid_playlist_mode")
 	ssid_random = obs.obs_data_get_bool(settings, "ssid_random")
 	ssid_total_seconds = obs.obs_data_get_int(settings, "ssid_total_seconds")
 	ssid_total_seconds_ot = obs.obs_data_get_int(settings, "ssid_total_seconds_from")
 	ssid_total_seconds_to = obs.obs_data_get_int(settings, "ssid_total_seconds_to")
 	ssid_source_name = obs.obs_data_get_string(settings, "ssid_source_name")
---	ssid_playlist_delay = obs.obs_data_get_bool(settings, "ssid_playlist_delay")
+	local_file_array = obs.obs_data_get_array(settings, "local_file_array")
 end
 
 function script_defaults(settings) 			--начальные значения
 	obs.obs_data_set_default_bool(settings, "ssid_switch", false)
 	obs.obs_data_set_default_int(settings, "ssid_locale", 1)
 	obs.obs_data_set_default_int(settings, "ssid_mode", 1)
+	obs.obs_data_set_default_int(settings, "ssid_playlist_mode", 1)
 	obs.obs_data_set_default_bool(settings, "ssid_random", false)
 	obs.obs_data_set_default_int(settings, "ssid_total_seconds", 1)
 	obs.obs_data_set_default_int(settings, "ssid_total_seconds_from", 1)
 	obs.obs_data_set_default_int(settings, "ssid_total_seconds_to", 10)
 	obs.obs_data_set_default_string(settings, "ssid_source_name", "")
---	obs.obs_data_set_default_bool(settings, "ssid_playlist_delay", false)
 	script_load(settings) --нам нужно загрузить данные до функции script_description()
 	obs.obs_frontend_add_event_callback(on_event)
 end
