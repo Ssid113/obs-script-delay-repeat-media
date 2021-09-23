@@ -310,8 +310,6 @@ function script_defaults(settings) 			--начальные значения
 	script_load(settings) --нам нужно загрузить данные до функции script_description()
 	obs.obs_frontend_add_event_callback(on_event)
 end
-<<<<<<< HEAD
-=======
 
 --function script_unload()
 	--timers_remove()
@@ -335,4 +333,3 @@ end
 --		obs.obs_source_update(source, pr_settings)
 --		obs.obs_data_release(pr_settings)
 --end
->>>>>>> 679b847f8e08c7b112c4713b9d7a3b990b6e3d32
