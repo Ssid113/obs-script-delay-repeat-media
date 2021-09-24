@@ -1,5 +1,5 @@
 local obs = obslua							--obs
-local ssid_current_version = "v0.3.1"
+local ssid_current_version = "v0.3.2"
 local ssid_switch = true 					--Флаг таймера
 local ssid_random = false 					--рандомное срабатывание
 local ssid_total_seconds = 10 				--секунды таймера
@@ -95,13 +95,15 @@ function on_event(event)					--ожидаем когда загрузится с
 end
 
 function signal_visible_event(event)		--Обрабатываем сигнал включения отображения источника
-	media_stop()
-	ssid_visible = true
+	--media_stop()
+	--ssid_visible = true
+	start_update()
 end
 
 function signal_not_visible_event(event)	--Обрабатываем сигнал выключения отображения источника
 	media_stop()
 	ssid_visible = false
+	timers_remove()
 end
 
 function connect_signal()					--Подписываемся на сигналы
@@ -144,7 +146,7 @@ function start_update()						--При обновлении параметров 
 	if ssid_sceneitem then
 		ssid_visible = obs.obs_source_active(ssid_sceneitem)
 		print(localization.translate('func_update_end'))
-		connect_signal()
+		--connect_signal()
 		media_stop()
 		if ssid_switch then
 			print(localization.translate('script_on') .. tostring(ssid_switch))
@@ -244,6 +246,7 @@ function script_update(settings) 			--Обновление настроек.
 	ssid_total_seconds_from = obs.obs_data_get_int(settings, "ssid_total_seconds_from")
 	ssid_total_seconds_to = obs.obs_data_get_int(settings, "ssid_total_seconds_to")
 	local_file_array = obs.obs_data_get_array(settings, "local_file_array")
+	connect_signal()
 	start_update()
 	
 	my_settings = settings
