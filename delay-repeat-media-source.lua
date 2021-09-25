@@ -1,5 +1,5 @@
 local obs = obslua							--obs
-local ssid_current_version = "v0.3.2"
+local ssid_current_version = "v0.3.3"
 local ssid_switch = true 					--Флаг таймера
 local ssid_random = false 					--рандомное срабатывание
 local ssid_total_seconds = 10 				--секунды таймера
@@ -26,7 +26,9 @@ function play_source() 						--Запустить источник
 	if ssid_sceneitem then
 		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
 		if ssid_visible then
-			obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
+			if obs.obs_data_array_count(local_file_array) ~= 0 then
+				obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
+			end
 			obs.obs_source_update(ssid_sceneitem, pr_settings)
 		end
 		obs.timer_add(play_source,ssid_total_seconds*1000)
@@ -47,7 +49,9 @@ function play_source_random()				--Запускать источник ранд�
 	if ssid_sceneitem then
 		local pr_settings = obs.obs_source_get_settings(ssid_sceneitem)
 		if ssid_visible then
-			obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
+			if obs.obs_data_array_count(local_file_array) ~= 0 then
+				obs.obs_data_set_string(pr_settings, "local_file", obs.obs_data_get_string(obs.obs_data_array_item(local_file_array, array_number()), "value"))  --Устанавливаем свой файл
+			end
 			obs.obs_source_update(ssid_sceneitem, pr_settings)
 		end
 		obs.timer_add(play_source_random,rand*1000)
@@ -125,7 +129,7 @@ function disconnect_signal()				--Отписываемся от сигналов
 end
 
 function array_number()						--Выбираем файл в плейлисте--
-	if ssid_playlist_mode == 1 then
+	if ssid_playlist_mode == 1 or obs.obs_data_array_count(local_file_array) == 1 then
 		if obs.obs_data_array_count(local_file_array) == ssid_number then
 			ssid_number = 1
 		else
@@ -134,7 +138,7 @@ function array_number()						--Выбираем файл в плейлисте--
 	else
 		ssid_number = random(1, obs.obs_data_array_count(local_file_array))
 	end
-	print(ssid_number - 1)
+	--print(ssid_number - 1)
 	return ssid_number - 1
 end
 
@@ -142,6 +146,7 @@ end
 ---------------------------------------------------------------SETTINGS------------------------------------------------------------------
 function start_update()						--При обновлении параметров настраиваем таймеры
 	timers_remove()
+	ssid_number = 0
 	local ssid_sceneitem = obs.obs_get_source_by_name(ssid_source_name)
 	if ssid_sceneitem then
 		ssid_visible = obs.obs_source_active(ssid_sceneitem)
